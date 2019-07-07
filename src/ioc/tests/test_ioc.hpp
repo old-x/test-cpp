@@ -1,5 +1,5 @@
-#ifndef TEST_CONTEXT_HPP
-#define TEST_CONTEXT_HPP
+#ifndef TEST_IOC_HPP
+#define TEST_IOC_HPP
 
 #include "calc_impl.h"
 #include "conv_impl.h"
@@ -7,7 +7,7 @@
 
 #include "ioc/ioc.hpp"
 
-TEST_CASE("Test ioc", "[context]") {
+TEST_CASE("Test context", "[ioc]") {
     auto ctx = ioc::context{
         ioc::new_bean<calc, calc_impl>(),
         ioc::new_bean<conv, conv_impl>(),

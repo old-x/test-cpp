@@ -1,5 +1,5 @@
 set(BINARY_NAME "ioc-test")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g -fsanitize=address -fsanitize=leak")
+set(CMAKE_CXX_FLAGS ${TEST_CXX_FLAGS})
 
 aux_source_directory("${CMAKE_CURRENT_SOURCE_DIR}/beans/src" SOURCE_FILES)
 

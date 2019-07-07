@@ -24,16 +24,16 @@ public:
     constexpr explicit bean(bean&&) = default;
     constexpr bean &operator=(bean&&) = default;
 
-    constexpr operator bool() const {
+    constexpr operator bool() const noexcept {
         return _storage;
     }
 
-    constexpr implementation *get() const {
+    constexpr implementation *get() const noexcept {
         return _storage.get();
     }
 
     template <class type>
-    static constexpr bool is_interface() {
+    static constexpr bool is_interface() noexcept {
         return std::is_same_v<type, interface>;
     }
 

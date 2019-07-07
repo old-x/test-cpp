@@ -39,7 +39,7 @@ private:
     struct not_found_tag {};
 
     template <class interface, std::size_t index = 0>
-    static constexpr auto search_bean() {
+    static constexpr auto search_bean() noexcept {
         if constexpr (index >= std::tuple_size_v<beans_t>) {
             return not_found_tag{};
         } else {

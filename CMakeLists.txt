@@ -6,6 +6,7 @@ include(CTest)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-W -Wall -Wextra -Wpedantic -Wshadow")
+set(TEST_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g -fsanitize=address -fsanitize=leak")
 set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/install")
 set(TEST_LIB_DIR "${PROJECT_SOURCE_DIR}/tests/lib")
 set(STATIC_STD_GCC_FLAGS "-static-libstdc++" "-static-libgcc")

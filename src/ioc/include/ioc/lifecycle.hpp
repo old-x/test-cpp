@@ -21,11 +21,11 @@ struct lifecycle final {
     }
 
     template <class bean, typename = decltype(std::declval<bean>().destroy())>
-    static constexpr void destroy(bean *instance) {
+    static constexpr void destroy(bean *instance) noexcept {
         instance->destroy();
     }
 
-    static constexpr void destroy(...) {
+    static constexpr void destroy(...) noexcept {
     }
 };
 

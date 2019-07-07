@@ -11,13 +11,13 @@ namespace ioc {
 template <class instance>
 class storage final {
 public:
-    constexpr storage():
+    constexpr storage() noexcept:
     _instance{nullptr},
     _memory{} {
 
     }
 
-    ~storage() {
+    ~storage() noexcept {
         if (_instance) {
             lifecycle::destroy(_instance);
             _instance->~instance();
@@ -29,11 +29,11 @@ public:
     constexpr explicit storage(storage&&) = default;
     constexpr storage &operator=(storage&&) = default;
 
-    constexpr operator bool() const {
+    constexpr operator bool() const noexcept {
         return _instance;
     }
 
-    constexpr instance *get() const {
+    constexpr instance *get() const noexcept {
         return _instance;
     }
 
