@@ -76,6 +76,39 @@ TEST_CASE("Test options", "[args]") {
         opts.get("c").value().get_values<double>().value(),
         std::vector<double>{1.2, 2.3, 3.4}
     );
+
+    opts.add_option(
+        "help,h", "Show help message", false
+    ).add_option(
+        "title", "Desired title", true
+    ).add_option(
+        "a", "First coefficient", true
+    );
+    std::ostringstream out;
+    REQUIRE(opts.validate(out) == true);
+    REQUIRE(out.str() == "");
+    opts.add_option(
+        "extra,x", "Non existent parameter", true
+    ).add_option(
+        "r", "Required parameter", true
+    );
+    REQUIRE(opts.validate(out) == false);
+    REQUIRE(
+        out.str() ==
+        "Required: --extra,x Non existent parameter\n"
+        "Required: -r Required parameter\n"
+    );
+    out.str("");
+    opts.show_options(out);
+    REQUIRE(
+        out.str() ==
+        "executable --[help,h] --<title> -<a> --<extra,x> -<r>\n"
+        "--help,h Show help message [optional]\n"
+        "--title Desired title <required>\n"
+        "-a First coefficient <required>\n"
+        "--extra,x Non existent parameter <required>\n"
+        "-r Required parameter <required>\n"
+    );
 }
 
 static void test_properties(args::properties &props) {
@@ -85,7 +118,10 @@ static void test_properties(args::properties &props) {
     REQUIRE(props.get<std::string>("server.address").value() == "https://google.com");
     REQUIRE(props.get<std::string>("path").value() == "c:\\wikipedia\\templates\\xyz");
     REQUIRE(props.get<std::string>("pass\\xwordT").value() == "123456Z");
-    REQUIRE(props.get<std::string>("key with spaces").value() == "It is the value accessible by key \"key with spaces\".");
+    REQUIRE(
+        props.get<std::string>("key with spaces").value() ==
+        "It is the value accessible by key \"key with spaces\"."
+    );
     REQUIRE(props.get<int>("com.test.value").value() == 123);
     REQUIRE(props.get<long>("connection.timeout.ms").value() == 3500);
     REQUIRE(props.get<std::string>("user").value() == "admin\\ ");

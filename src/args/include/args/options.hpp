@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <optional>
+#include <ostream>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -22,8 +23,45 @@ public:
     options(const int argc, const char *argv[]):
     _application_name{},
     _positional_values{},
-    _named_values{} {
+    _named_values{},
+    _option_descriptions{} {
         init(argc, argv);
+    }
+
+    options &add_option(const std::string_view &name, const std::string_view &desc, const bool required) {
+        const auto pos = name.find(comma_symbol);
+        if (pos == std::string_view::npos) {
+            _option_descriptions.emplace_back(name, desc, required);
+        } else {
+            _option_descriptions.emplace_back(name.substr(0, pos), name.substr(pos + 1), desc, required);
+        }
+        return *this;
+    }
+
+    void show_options(std::ostream &out) const {
+        out << _application_name;
+        if (_option_descriptions.empty()) {
+            out << " [args...]" << endl_symbol;
+            return;
+        }
+        for (const option_description &opt : _option_descriptions) {
+            out << space_symbol;
+            opt.show(out);
+        }
+        out << endl_symbol;
+        for (const option_description &opt : _option_descriptions) {
+            opt.show_full(out);
+        }
+    }
+
+    bool validate(std::ostream &out) const {
+        bool result = true;
+        for (const option_description &opt : _option_descriptions) {
+            if (!opt.validate(*this, out)) {
+                result = false;
+            }
+        }
+        return result;
     }
 
     inline const std::string &get_application_name() const {
@@ -66,6 +104,12 @@ private:
     static constexpr char dash_symbol = '-';
     static constexpr char equals_symbol = '=';
     static constexpr char space_symbol = ' ';
+    static constexpr char comma_symbol = ',';
+    static constexpr char angle_bracket_open_symbol = '<';
+    static constexpr char angle_bracket_close_symbol = '>';
+    static constexpr char square_bracket_open_symbol = '[';
+    static constexpr char square_bracket_close_symbol = ']';
+    static constexpr char endl_symbol = '\n';
 
     static constexpr std::size_t short_option_length = 1;
     static constexpr std::size_t long_option_length = 2;
@@ -73,9 +117,91 @@ private:
     using positional_values_t = std::vector<value>;
     using named_values_t = std::unordered_map<std::string, value>;
 
+    class option_description {
+    public:
+        option_description(const std::string_view &name, const std::string_view &desc,
+                           const bool required):
+        option_description{name.size() > 1 ? name : "", name.size() == 1 ? name : "", desc, required} {
+
+        }
+
+        option_description(const std::string_view &long_name, const std::string_view &short_name,
+                            const std::string_view &desc, const bool required):
+        _long_name{long_name.data(), long_name.size()},
+        _short_name{short_name.data(), short_name.size()},
+        _description{desc.data(), desc.size()},
+        _required{required} {
+
+        }
+
+        void show(std::ostream &out) const {
+            show_name(out, true);
+        }
+
+        void show_full(std::ostream &out) const {
+            show_name(out, false) << space_symbol << _description << space_symbol;
+            if (_required) {
+                out << angle_bracket_open_symbol << "required" << angle_bracket_close_symbol;
+            } else {
+                out << square_bracket_open_symbol << "optional" << square_bracket_close_symbol;
+            }
+            out << endl_symbol;
+        }
+
+        bool validate(const options &opts, std::ostream &out) const {
+            if (!_required) {
+                return true;
+            }
+            if (!_long_name.empty() && opts.get(_long_name)) {
+                return true;
+            }
+            if (!_short_name.empty() && opts.get(_short_name)) {
+                return true;
+            }
+            out << "Required: ";
+            show_name(out, false);
+            out << space_symbol << _description << endl_symbol;
+            return false;
+        }
+
+    private:
+        std::string _long_name;
+        std::string _short_name;
+        std::string _description;
+        bool _required;
+
+        std::ostream &show_name(std::ostream &out, const bool with_brackets) const {
+            const bool is_short = !_short_name.empty();
+            if (!_long_name.empty()) {
+                out << std::string(long_option_length, dash_symbol);
+                if (with_brackets) {
+                    out << (_required ? angle_bracket_open_symbol : square_bracket_open_symbol);
+                }
+                out << _long_name;
+                if (is_short) {
+                    out << comma_symbol << _short_name;
+                }
+                if (with_brackets) {
+                    out << (_required ? angle_bracket_close_symbol : square_bracket_close_symbol);
+                }
+            } else if (is_short) {
+                out << std::string(short_option_length, dash_symbol);
+                if (with_brackets) {
+                    out << (_required ? angle_bracket_open_symbol : square_bracket_open_symbol);
+                }
+                out << _short_name;
+                if (with_brackets) {
+                    out << (_required ? angle_bracket_close_symbol : square_bracket_close_symbol);
+                }
+            }
+            return out;
+        }
+    };
+
     std::string _application_name;
     positional_values_t _positional_values;
     named_values_t _named_values;
+    std::vector<option_description> _option_descriptions;
 
     template <class type>
     static constexpr bool is_bool = std::is_same_v<type, bool>;
