@@ -1,5 +1,6 @@
-#define CATCH_CONFIG_MAIN
-
-#include "catch2/catch.hpp"
-
 #include "test_ioc.hpp"
+
+int main() {
+    test_context();
+    return 0;
+}

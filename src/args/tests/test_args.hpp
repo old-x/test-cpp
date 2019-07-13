@@ -1,41 +1,66 @@
 #ifndef TEST_ARGS_HPP
 #define TEST_ARGS_HPP
 
+#include <cassert>
+
 #include "args/args.hpp"
 
 template <class type>
-static void test_vectors(const std::vector<type> &lhs, const std::vector<type> &rhs) {
-    REQUIRE(lhs.size() == rhs.size());
+static void _test_vectors(const std::vector<type> &lhs, const std::vector<type> &rhs) {
+    assert(lhs.size() == rhs.size());
     for (std::size_t i = 0, n = lhs.size(); i < n; ++i) {
-        REQUIRE(lhs[i] == rhs[i]);
+        if constexpr (std::is_floating_point_v<type>) {
+            assert(std::abs(lhs[i] - rhs[i]) < 1e-10);
+        } else {
+            assert(lhs[i] == rhs[i]);
+        }
     }
 }
 
-TEST_CASE("Test value", "[args]") {
-    REQUIRE(args::value{"value"}.get<std::string>().value() == "value");
-    REQUIRE(args::value{""}.set("X").get<std::string>().value() == "X");
-    REQUIRE(args::value{""}.add("Y").get<std::string>().value() == "Y");
-    REQUIRE(args::value{"123"}.get<int>().value() == 123);
-    REQUIRE(args::value{"123.456"}.get<double>().value() == 123.456);
-    REQUIRE(args::value{"tRuE"}.get<bool>().value() == true);
-    REQUIRE(args::value{"1"}.get<bool>().value() == true);
-    REQUIRE(args::value{"0"}.get<bool>().value() == false);
-    REQUIRE(args::value{"text"}.get<bool>().value() == false);
-    REQUIRE(args::value{"11.22"}.get_values().value().size() == 1);
-    REQUIRE(args::value{"11.22"}.get_values().value()[0].get<float>().value() == 11.22f);
+static void _test_properties(args::properties &props) {
+    assert(props.size() == 12);
+    assert(props.get<std::string>("name3").value() == "line1,line2,line3,line4 ");
+    assert(props.get<std::string>("na\\me2").value() == "value\\2");
+    assert(props.get<std::string>("server.address").value() == "https://google.com");
+    assert(props.get<std::string>("path").value() == "c:\\wikipedia\\templates\\xyz");
+    assert(props.get<std::string>("pass\\xwordT").value() == "123456Z");
+    assert(
+        props.get<std::string>("key with spaces").value() ==
+        "It is the value accessible by key \"key with spaces\"."
+    );
+    assert(props.get<int>("com.test.value").value() == 123);
+    assert(props.get<long>("connection.timeout.ms").value() == 3500);
+    assert(props.get<std::string>("user").value() == "admin\\ ");
+    assert(props.get<std::string>("empty").value() == "");
+    assert(props.get<std::string>("\\name1") == "value1    fgfg \\xyz");
+    assert(std::abs(props.get<double>("server.timeout").value() - 5.45) < 1e-10);
+}
+
+void test_value() {
+    assert(args::value{"value"}.get<std::string>().value() == "value");
+    assert(args::value{""}.set("X").get<std::string>().value() == "X");
+    assert(args::value{""}.add("Y").get<std::string>().value() == "Y");
+    assert(args::value{"123"}.get<int>().value() == 123);
+    assert(std::abs(args::value{"123.456"}.get<double>().value() - 123.456) < 1e-10);
+    assert(args::value{"tRuE"}.get<bool>().value() == true);
+    assert(args::value{"1"}.get<bool>().value() == true);
+    assert(args::value{"0"}.get<bool>().value() == false);
+    assert(args::value{"text"}.get<bool>().value() == false);
+    assert(args::value{"11.22"}.get_values().value().size() == 1);
+    assert(std::abs(args::value{"11.22"}.get_values().value()[0].get<float>().value() - 11.22f) < 1e-10f);
     std::string value;
     value.append("22");
     value.push_back(0);
     value.append("33");
     value.push_back(0);
     value.append("44");
-    test_vectors<int>(
+    _test_vectors<int>(
         args::value{std::move(value)}.get_values<int>().value(),
         std::vector<int>{22, 33, 44}
     );
 }
 
-TEST_CASE("Test options", "[args]") {
+void test_options() {
     const char *argv[] = {
         "executable", "arg1", "arg2",
         "--help",
@@ -51,28 +76,28 @@ TEST_CASE("Test options", "[args]") {
         "--", "arg3", "arg4"
     };
     args::options opts{sizeof(argv) / sizeof(argv[0]), argv};
-    REQUIRE(opts.get_application_name() == "executable");
-    REQUIRE(opts.get_positional_size() == 4);
-    REQUIRE(opts.get_named_size() == 9);
-    REQUIRE(opts.get<std::string>(0).value() == "arg1");
-    REQUIRE(opts.get<std::string>(1).value() == "arg2");
-    REQUIRE(opts.get<std::string>(2).value() == "arg3");
-    REQUIRE(opts.get<std::string>(3).value() == "arg4");
-    REQUIRE(opts.get<bool>("help").value() == true);
-    REQUIRE(opts.get<bool>("log").value() == false);
-    REQUIRE(opts.get<bool>("v").value() == true);
-    REQUIRE(opts.get<int>("a").value() == 10);
-    REQUIRE(opts.get<std::string>("type").value() == "int");
-    test_vectors<std::string>(
+    assert(opts.get_application_name() == "executable");
+    assert(opts.get_positional_size() == 4);
+    assert(opts.get_named_size() == 9);
+    assert(opts.get<std::string>(0).value() == "arg1");
+    assert(opts.get<std::string>(1).value() == "arg2");
+    assert(opts.get<std::string>(2).value() == "arg3");
+    assert(opts.get<std::string>(3).value() == "arg4");
+    assert(opts.get<bool>("help").value() == true);
+    assert(opts.get<bool>("log").value() == false);
+    assert(opts.get<bool>("v").value() == true);
+    assert(opts.get<int>("a").value() == 10);
+    assert(opts.get<std::string>("type").value() == "int");
+    _test_vectors<std::string>(
         opts.get("set").value().get_values<std::string>().value(),
         std::vector<std::string>{"set1", "set2", "set3"}
     );
-    test_vectors<int>(
+    _test_vectors<int>(
         opts.get("b").value().get_values<int>().value(),
         std::vector<int>{20, 30}
     );
-    REQUIRE(opts.get<std::string>("title").value() == "text with spaces");
-    test_vectors<double>(
+    assert(opts.get<std::string>("title").value() == "text with spaces");
+    _test_vectors<double>(
         opts.get("c").value().get_values<double>().value(),
         std::vector<double>{1.2, 2.3, 3.4}
     );
@@ -85,22 +110,22 @@ TEST_CASE("Test options", "[args]") {
         "a", "First coefficient", true
     );
     std::ostringstream out;
-    REQUIRE(opts.validate(out) == true);
-    REQUIRE(out.str() == "");
+    assert(opts.validate(out) == true);
+    assert(out.str() == "");
     opts.add_option(
         "extra,x", "Non existent parameter", true
     ).add_option(
         "r", "Required parameter", true
     );
-    REQUIRE(opts.validate(out) == false);
-    REQUIRE(
+    assert(opts.validate(out) == false);
+    assert(
         out.str() ==
         "Required: --extra,x Non existent parameter\n"
         "Required: -r Required parameter\n"
     );
     out.str("");
     opts.show_options(out);
-    REQUIRE(
+    assert(
         out.str() ==
         "executable --[help,h] --<title> -<a> --<extra,x> -<r>\n"
         "--help,h Show help message [optional]\n"
@@ -111,26 +136,7 @@ TEST_CASE("Test options", "[args]") {
     );
 }
 
-static void test_properties(args::properties &props) {
-    REQUIRE(props.size() == 12);
-    REQUIRE(props.get<std::string>("name3").value() == "line1,line2,line3,line4 ");
-    REQUIRE(props.get<std::string>("na\\me2").value() == "value\\2");
-    REQUIRE(props.get<std::string>("server.address").value() == "https://google.com");
-    REQUIRE(props.get<std::string>("path").value() == "c:\\wikipedia\\templates\\xyz");
-    REQUIRE(props.get<std::string>("pass\\xwordT").value() == "123456Z");
-    REQUIRE(
-        props.get<std::string>("key with spaces").value() ==
-        "It is the value accessible by key \"key with spaces\"."
-    );
-    REQUIRE(props.get<int>("com.test.value").value() == 123);
-    REQUIRE(props.get<long>("connection.timeout.ms").value() == 3500);
-    REQUIRE(props.get<std::string>("user").value() == "admin\\ ");
-    REQUIRE(props.get<std::string>("empty").value() == "");
-    REQUIRE(props.get<std::string>("\\name1") == "value1    fgfg \\xyz");
-    REQUIRE(props.get<double>("server.timeout").value() == 5.45);
-}
-
-TEST_CASE("Test properties", "[args]") {
+void test_properties() {
     std::stringstream input;
     input << "  \t  name3  \t= \t line1,\\\r\r      \t  line2,\\\rline3,\\\n     line4 \r\n" << std::endl;
     input << "#comment1=value1" << std::endl;
@@ -154,15 +160,15 @@ TEST_CASE("Test properties", "[args]") {
     props.set("server.address", "https://google.com");
     props.set("server.timeout", "5.45");
 
-    test_properties(props);
+    _test_properties(props);
 
     std::stringstream output;
-    REQUIRE(props.save(output));
+    assert(props.save(output));
 
     args::properties props_for_load;
-    REQUIRE(props_for_load.load(output));
+    assert(props_for_load.load(output));
 
-    test_properties(props_for_load);
+    _test_properties(props_for_load);
 }
 
 #endif
