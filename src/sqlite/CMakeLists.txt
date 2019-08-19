@@ -1,0 +1,15 @@
+set(SQLITE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+set(LIBSQLITE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+set(LIBSQLITE_INCLUDE_DIR "${LIBSQLITE_DIR}/include")
+
+if (BUILD_TESTING)
+  add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/tests")
+endif()
+
+add_library(libsqlite OBJECT "${LIBSQLITE_DIR}/src/sqlite3.c")
+add_library(sqlite INTERFACE)
+
+target_include_directories(sqlite INTERFACE "${LIBSQLITE_INCLUDE_DIR}/sqlite")
+
+install(DIRECTORY ${SQLITE_INCLUDE_DIR} DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(DIRECTORY ${LIBSQLITE_INCLUDE_DIR} DESTINATION ${CMAKE_INSTALL_PREFIX})

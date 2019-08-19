@@ -1,5 +1,5 @@
-#ifndef CONTEXT_HPP
-#define CONTEXT_HPP
+#ifndef IOC_CONTEXT_HPP
+#define IOC_CONTEXT_HPP
 
 #include <mutex>
 #include <tuple>

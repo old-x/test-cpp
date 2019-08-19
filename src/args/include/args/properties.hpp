@@ -1,5 +1,5 @@
-#ifndef PROPERTIES_HPP
-#define PROPERTIES_HPP
+#ifndef ARGS_PROPERTIES_HPP
+#define ARGS_PROPERTIES_HPP
 
 #include <array>
 #include <fstream>

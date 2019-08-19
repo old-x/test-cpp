@@ -1,5 +1,5 @@
-#ifndef LOGGER_H
-#define LOGGER_H
+#ifndef TEST_IOC_LOGGER_H
+#define TEST_IOC_LOGGER_H
 
 #include <string>
 

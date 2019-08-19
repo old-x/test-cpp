@@ -1,5 +1,5 @@
-#ifndef ENCODER_HPP
-#define ENCODER_HPP
+#ifndef PACK_ENCODER_HPP
+#define PACK_ENCODER_HPP
 
 #include <array>
 #include <cstdint>

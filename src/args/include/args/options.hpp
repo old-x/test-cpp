@@ -1,5 +1,5 @@
-#ifndef OPTIONS_HPP
-#define OPTIONS_HPP
+#ifndef ARGS_OPTIONS_HPP
+#define ARGS_OPTIONS_HPP
 
 #include <cstdlib>
 #include <optional>

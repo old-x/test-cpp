@@ -1,5 +1,5 @@
-#ifndef CALC_IMPL_H
-#define CALC_IMPL_H
+#ifndef TEST_IOC_CALC_IMPL_H
+#define TEST_IOC_CALC_IMPL_H
 
 #include "conv.h"
 #include "logger.h"
@@ -15,7 +15,7 @@ public:
 
     }
 
-    ~calc_impl();
+    ~calc_impl() override;
 
     int sum(int a, int b) override;
 

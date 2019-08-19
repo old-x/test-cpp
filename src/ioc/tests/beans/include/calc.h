@@ -1,5 +1,5 @@
-#ifndef CALC_H
-#define CALC_H
+#ifndef TEST_IOC_CALC_H
+#define TEST_IOC_CALC_H
 
 struct calc {
     virtual ~calc() = default;

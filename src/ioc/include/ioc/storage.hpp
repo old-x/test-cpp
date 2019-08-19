@@ -1,5 +1,5 @@
-#ifndef STORAGE_HPP
-#define STORAGE_HPP
+#ifndef IOC_STORAGE_HPP
+#define IOC_STORAGE_HPP
 
 #include <cstdint>
 #include <utility>

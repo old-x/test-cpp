@@ -1,5 +1,5 @@
-#ifndef CONV_H
-#define CONV_H
+#ifndef TEST_IOC_CONV_H
+#define TEST_IOC_CONV_H
 
 #include <cstdint>
 

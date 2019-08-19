@@ -1,5 +1,5 @@
-#ifndef BEAN_HPP
-#define BEAN_HPP
+#ifndef IOC_BEAN_HPP
+#define IOC_BEAN_HPP
 
 #include <tuple>
 #include <utility>

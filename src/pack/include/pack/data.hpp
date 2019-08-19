@@ -1,5 +1,5 @@
-#ifndef DATA_HPP
-#define DATA_HPP
+#ifndef PACK_DATA_HPP
+#define PACK_DATA_HPP
 
 #include <cstdint>
 #include <type_traits>

@@ -1,5 +1,5 @@
-#ifndef CONV_IMPL_H
-#define CONV_IMPL_H
+#ifndef TEST_IOC_CONV_IMPL_H
+#define TEST_IOC_CONV_IMPL_H
 
 #include "logger.h"
 #include "conv.h"
@@ -14,7 +14,7 @@ public:
 
     }
 
-    ~conv_impl();
+    ~conv_impl() override;
 
     int convert(int a) override;
     std::size_t calls_count() const override;

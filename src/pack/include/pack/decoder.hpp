@@ -1,5 +1,5 @@
-#ifndef DECODER_HPP
-#define DECODER_HPP
+#ifndef PACK_DECODER_HPP
+#define PACK_DECODER_HPP
 
 #include <array>
 #include <cstdint>
@@ -108,19 +108,24 @@ private:
             const std::make_unsigned_t<type> value, const std::uint8_t size)
         {
             reader_t reader = get_reader(size);
-            return (*reader)(first_byte, &value);
+            return (*reader)(first_byte, &value, sizeof(type));
         }
 
     private:
         template <class ...args> data_reader(args...) = delete;
 
-        using reader_t = type(*)(const std::uint8_t first_byte, const void *source);
+        using reader_t = type(*)(const std::uint8_t first_byte, const void *source, const std::size_t size);
         using readers_t = std::array<reader_t, max_size>;
 
         template <class data>
-        static constexpr type read(const std::uint8_t first_byte, const void *source) {
+        static constexpr type read(const std::uint8_t first_byte, const void *source, const std::size_t source_size) {
             using data_t = typename data::type_t;
-            data_t value = *reinterpret_cast<const data_t*>(source);
+            data_t value = 0;
+            if (sizeof(data_t) == source_size) {
+                value = *reinterpret_cast<const data_t*>(source);
+            } else {
+                std::memcpy(&value, source, std::min(sizeof(data_t), source_size));
+            }
             const std::uint8_t size = data::bytes();
             value <<= (max_size - size);
             value |= (first_byte & masks[size - 1]);

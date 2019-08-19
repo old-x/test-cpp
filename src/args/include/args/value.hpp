@@ -1,5 +1,5 @@
-#ifndef VALUE_HPP
-#define VALUE_HPP
+#ifndef ARGS_VALUE_HPP
+#define ARGS_VALUE_HPP
 
 #include <optional>
 #include <sstream>

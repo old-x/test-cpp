@@ -1,5 +1,5 @@
-#ifndef LIFECYCLE_HPP
-#define LIFECYCLE_HPP
+#ifndef IOC_LIFECYCLE_HPP
+#define IOC_LIFECYCLE_HPP
 
 #include <utility>
 
