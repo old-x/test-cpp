@@ -149,9 +149,9 @@ public:
         }
         if constexpr (std::is_same_v<type, std::string> || std::is_same_v<type, std::string_view>) {
             if (checked_type != SQLITE_BLOB && checked_type != SQLITE_TEXT) {
-                std::ostringstream out;
-                out << get_type_name(SQLITE_BLOB) << '|' << get_type_name(SQLITE_TEXT);
-                throw type_mismatch(checked_type, out.str().c_str());
+                std::ostringstream err;
+                err << get_type_name(SQLITE_BLOB) << '|' << get_type_name(SQLITE_TEXT);
+                throw type_mismatch(checked_type, err.str().c_str());
             }
             const int size = sqlite3_column_bytes(_stmt, index);
             const char *data = reinterpret_cast<const char*>(checked_type == SQLITE_BLOB ?
@@ -216,17 +216,17 @@ private:
     }
 
     static exception type_mismatch(const int type, const char *expected_message) {
-        std::ostringstream out;
-        out << exception{SQLITE_MISMATCH}.message();
-        out << ": type=" << get_type_name(type) << ", expected=" << expected_message;
-        return exception{SQLITE_MISMATCH, out.str()};
+        std::ostringstream err;
+        err << exception{SQLITE_MISMATCH}.message();
+        err << ": type=" << get_type_name(type) << ", expected=" << expected_message;
+        return exception{SQLITE_MISMATCH, err.str()};
     }
 
     static exception range_error(const int index, const int size) {
-        std::ostringstream out;
-        out << exception{SQLITE_RANGE}.message();
-        out << ": " << __func__ << ": index=" << index << ", size=" << size;
-        return exception{SQLITE_RANGE, out.str()};
+        std::ostringstream err;
+        err << exception{SQLITE_RANGE}.message();
+        err << ": " << __func__ << ": index=" << index << ", size=" << size;
+        return exception{SQLITE_RANGE, err.str()};
     }
 
     static void check_range(const int index, const int size) {
