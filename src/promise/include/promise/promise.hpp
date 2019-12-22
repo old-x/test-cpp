@@ -143,6 +143,7 @@ public:
         if (_state == state::result)
             return std::move(_result);
         _exception->rethrow();
+        return {};
     }
 
     template <class rep, class period>
