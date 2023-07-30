@@ -4,7 +4,7 @@ project("test-cpp")
 
 include(CTest)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "-W -Wall -Wextra -Wpedantic -Wshadow")
 set(TEST_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g -fsanitize=address -fsanitize=leak")
 set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/install")

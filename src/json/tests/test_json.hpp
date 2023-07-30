@@ -122,7 +122,7 @@ R"({
 }
 
 void test_parser() {
-
+    std::puts(__func__);
 }
 
 void test_string() {

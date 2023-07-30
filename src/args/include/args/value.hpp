@@ -170,7 +170,7 @@ private:
             std::istringstream in{std::forward<string>(val)};
             in >> result;
             if (in.eof() && !in.fail()) {
-                return std::move(result);
+                return result;
             }
         }
         return {};
