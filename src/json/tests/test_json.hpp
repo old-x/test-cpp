@@ -2,6 +2,7 @@
 #define TEST_JSON_HPP
 
 #include <cassert>
+#include <iostream>
 #include <sstream>
 
 #include "json/json.hpp"
@@ -122,7 +123,67 @@ R"({
 }
 
 void test_parser() {
-    std::puts(__func__);
+    static constexpr const char *data = R"(
+{
+    "quiz": {
+        "sport": {
+            "q1": {
+                "question": "Which one is correct team name in NBA?",
+                "options": [
+                    "New York Bulls",
+                    "Los Angeles Kings",
+                    "Golden State Warriros",
+                    "Huston Rocket"
+                ],
+                "answer": "Huston Rocket"
+            }
+        },
+        "maths": {
+            "q1": {
+                "question": "5 + 7 = ?",
+                "options": [
+                    10,
+                    11,
+                    12,
+                    13
+                ],
+                "answer": 12
+            },
+            "q2": {
+                "question": "12 - 8 = ?",
+                "options": [
+                    1,
+                    2,
+                    3,
+                    4
+                ],
+                "answer": 4
+            }
+        },
+        "test": {
+            "true": true,
+            "false": false,
+            "null": null,
+            "number1": -1.234567890,
+            "number2": 0.123e5,
+            "number3": -0.123e+5,
+            "number4": -0.123E-5,
+            "array": [
+
+            ],
+            "object": {
+
+            }
+        }
+    }
+})";
+
+    try {
+        json::value v = json::parse(data);
+    } catch (const json::exception &e) {
+        std::cout << e.what() << std::endl;
+        assert(false);
+    }
 }
 
 void test_string() {
